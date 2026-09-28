@@ -1,0 +1,38 @@
+[
+  {
+    "name": "NOKIA_MASTER",
+    "score": 12500,
+    "level": 5,
+    "date": "2003-08-15"
+  },
+  {
+    "name": "RED_BALL_99",
+    "score": 9800,
+    "level": 4,
+    "date": "2004-02-20"
+  },
+  {
+    "name": "RETRO_TESTER",
+    "score": 8888,
+    "level": 3,
+    "date": "2026-09-28"
+  },
+  {
+    "name": "BOUNCER",
+    "score": 7200,
+    "level": 3,
+    "date": "2004-11-05"
+  },
+  {
+    "name": "RETRO_FAN",
+    "score": 4500,
+    "level": 2,
+    "date": "2005-06-12"
+  },
+  {
+    "name": "ROOKIE",
+    "score": 1500,
+    "level": 1,
+    "date": "2006-01-01"
+  }
+]

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nokia Bounce - Classic Red Ball Retro Platformer</title>
+  <meta name="description" content="Play the authentic classic Nokia Bounce red ball platformer with retro physics, rings, water buoyancy, size pumps, sound synthesizer, and Nokia keypad!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Outfit:wght@400;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="mode-arcade">
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-container">
+        <div class="logo-ball"></div>
+        <div class="logo-text">
+          <span class="logo-brand">NOKIA</span>
+          <span class="logo-title">BOUNCE</span>
+        </div>
+      </div>
+      <div class="badge-retro">FULLSCREEN HD</div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Fullscreen Toggle Button -->
+      <button id="btn-toggle-fullscreen" class="btn-retro btn-highlight" title="Enter True Fullscreen (Press F)">
+        <span class="btn-icon">⛶</span> <span id="fullscreen-label">Fullscreen</span>
+      </button>
+
+      <!-- View Mode Toggle -->
+      <button id="btn-toggle-view" class="btn-retro" title="Switch between Fullscreen Arcade and Classic Nokia Phone">
+        <span class="btn-icon">📱</span> <span id="view-mode-label">Phone View</span>
+      </button>
+
+      <!-- Level Selector -->
+      <div class="control-group">
+        <label for="level-select">LVL:</label>
+        <select id="level-select" class="retro-select">
+          <option value="0">1: Emerald Meadow</option>
+          <option value="1">2: Spike Canyon</option>
+          <option value="2">3: Sunken Aqueduct</option>
+          <option value="3">4: Machinery Bastion</option>
+          <option value="4">5: Ultimate Gauntlet</option>
+        </select>
+      </div>
+
+      <!-- Retro LCD Filter -->
+      <button id="btn-toggle-crt" class="btn-retro" title="Toggle LCD Pixel Grid">
+        <span class="btn-icon">📺</span> <span id="crt-label">LCD Filter: ON</span>
+      </button>
+
+      <!-- Audio Mute -->
+      <button id="btn-toggle-sound" class="btn-retro" title="Sound Effects & BGM">
+        <span class="btn-icon" id="sound-icon">🔊</span> Sound
+      </button>
+
+      <!-- Music Track Selector: Dhoom Machale vs Classic -->
+      <button id="btn-toggle-track" class="btn-retro btn-music" title="Switch Music: DHOOM MACHALE vs Classic Bounce">
+        <span class="btn-icon">🎵</span> <span id="music-track-label">Song: DHOOM MACHALE 🔥</span>
+      </button>
+
+      <!-- Level Editor -->
+      <button id="btn-open-editor" class="btn-retro btn-highlight">
+        <span class="btn-icon">🛠️</span> Editor
+      </button>
+
+      <!-- High Scores -->
+      <button id="btn-open-scores" class="btn-retro">
+        <span class="btn-icon">🏆</span> Leaderboard
+      </button>
+
+      <!-- Help -->
+      <button id="btn-open-help" class="btn-retro">
+        <span class="btn-icon">❓</span> Help
+      </button>
+    </div>
+  </header>
+
+  <!-- Cheat Notification Banner -->
+  <div id="cheat-banner" class="cheat-banner">★ CHEAT ACTIVATED: 787898 ★</div>
+
+  <!-- Main Game Stage -->
+  <main class="game-stage">
+    <!-- NOKIA PHONE CHASSIS WRAPPER -->
+    <div class="phone-wrapper" id="phone-chassis">
+      <!-- Phone Top Speaker & Logo -->
+      <div class="phone-top-bar">
+        <div class="speaker-grill">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="phone-logo">NOKIA</div>
+      </div>
+
+      <!-- Phone Screen Bezel -->
+      <div class="phone-screen-frame">
+        <!-- In-game HUD Header inside screen -->
+        <div class="screen-hud">
+          <div class="hud-item"><span class="hud-label">RINGS</span> <span id="hud-rings" class="hud-value">0/5</span></div>
+          <div class="hud-item"><span class="hud-label">SCORE</span> <span id="hud-score" class="hud-value">000000</span></div>
+          <div class="hud-item"><span class="hud-label">SIZE</span> <span id="hud-size" class="hud-value hud-accent">NORM</span></div>
+          <div class="hud-item"><span class="hud-label">LIVES</span> <span id="hud-lives" class="hud-value">❤️❤️❤️</span></div>
+          <div class="hud-item hud-tag" id="hud-level">LVL 1</div>
+        </div>
+
+        <!-- Canvas Container with optional Retro Scanline / LCD filter -->
+        <div class="canvas-viewport" id="canvas-viewport">
+          <canvas id="game-canvas"></canvas>
+          <div class="lcd-scanlines" id="lcd-overlay"></div>
+
+          <!-- Floating On-Screen Arcade Controls for Fullscreen -->
+          <div class="arcade-touch-controls" id="arcade-controls">
+            <div class="arcade-dpad">
+              <button id="arc-btn-left" class="arc-touch-btn" aria-label="Left">◀</button>
+              <button id="arc-btn-right" class="arc-touch-btn" aria-label="Right">▶</button>
+            </div>
+            <div class="arcade-actions">
+              <button id="arc-btn-down" class="arc-touch-btn dive-btn" aria-label="Dive / Crouch">▼ DIVE</button>
+              <button id="arc-btn-up" class="arc-touch-btn jump-btn" aria-label="Jump / Bounce">▲ JUMP</button>
+            </div>
+          </div>
+
+          <!-- In-Game Floating Menus & Overlays -->
+          <!-- 1. Start Menu Overlay -->
+          <div id="menu-overlay" class="game-overlay">
+            <div class="overlay-card">
+              <div class="card-hero-icon">🔴</div>
+              <h1 class="card-title">BOUNCE</h1>
+              <p class="card-subtitle">THE LEGENDARY NOKIA ADVENTURE</p>
+              <div class="card-actions">
+                <button id="btn-start-game" class="btn-action primary pulse-anim">START GAME</button>
+                <button id="btn-menu-help" class="btn-action">HOW TO PLAY</button>
+                <button id="btn-menu-scores" class="btn-action">HIGH SCORES</button>
+              </div>
+              <div class="cheat-hint">Dial <strong>787898</strong> for Super Ball!</div>
+            </div>
+          </div>
+
+          <!-- 2. Pause Overlay -->
+          <div id="pause-overlay" class="game-overlay hidden">
+            <div class="overlay-card">
+              <h2 class="card-title">PAUSED</h2>
+              <div class="card-actions">
+                <button id="btn-resume" class="btn-action primary">RESUME</button>
+                <button id="btn-restart" class="btn-action">RESTART LEVEL</button>
+                <button id="btn-quit-menu" class="btn-action">MAIN MENU</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Level Complete Overlay -->
+          <div id="level-complete-overlay" class="game-overlay hidden">
+            <div class="overlay-card victory-card">
+              <div class="card-hero-icon">⭐</div>
+              <h2 class="card-title text-gold">LEVEL CLEAR!</h2>
+              <div class="score-breakdown">
+                <div class="score-row"><span>Rings Collected:</span> <strong id="lc-rings-bonus">+1000</strong></div>
+                <div class="score-row"><span>Time Bonus:</span> <strong id="lc-time-bonus">+450</strong></div>
+                <div class="score-divider"></div>
+                <div class="score-row total"><span>Total Score:</span> <strong id="lc-total-score">1450</strong></div>
+              </div>
+              <div class="card-actions">
+                <button id="btn-next-level" class="btn-action primary">NEXT LEVEL ▶</button>
+                <button id="btn-replay-level" class="btn-action">REPLAY</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Game Over Overlay -->
+          <div id="game-over-overlay" class="game-overlay hidden">
+            <div class="overlay-card danger-card">
+              <div class="card-hero-icon">💥</div>
+              <h2 class="card-title text-danger">GAME OVER</h2>
+              <p class="card-subtitle">All lives lost!</p>
+              <div class="final-score-box">
+                <span>FINAL SCORE</span>
+                <strong id="go-final-score">0</strong>
+              </div>
+              <div class="submit-score-section">
+                <input type="text" id="player-name-input" maxlength="12" placeholder="ENTER YOUR NAME" value="PLAYER 1" class="retro-input">
+                <button id="btn-submit-score" class="btn-action highlight">SUBMIT TO LEADERBOARD</button>
+              </div>
+              <div class="card-actions">
+                <button id="btn-try-again" class="btn-action primary">TRY AGAIN</button>
+                <button id="btn-go-menu" class="btn-action">MENU</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Ultimate Victory Overlay -->
+          <div id="victory-overlay" class="game-overlay hidden">
+            <div class="overlay-card victory-card">
+              <div class="card-hero-icon">👑</div>
+              <h2 class="card-title text-gold">YOU BEAT THE GAME!</h2>
+              <p class="card-subtitle">You are the True Nokia Bounce Master!</p>
+              <div class="final-score-box">
+                <div>FINAL SCORE: <strong id="vic-final-score">0</strong></div>
+                <div>TOTAL TIME: <strong id="vic-total-time">0s</strong></div>
+              </div>
+              <div class="submit-score-section">
+                <input type="text" id="vic-name-input" maxlength="12" placeholder="YOUR NAME" value="CHAMPION" class="retro-input">
+                <button id="btn-vic-submit-score" class="btn-action highlight">RECORD VICTORY</button>
+              </div>
+              <div class="card-actions">
+                <button id="btn-vic-again" class="btn-action primary">PLAY AGAIN</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOKIA HARDWARE CONTROLS (D-Pad, Softkeys, 12-Key Numeric Pad) -->
+      <div class="phone-keypad-panel">
+        <!-- Soft Keys & Navi-Key row -->
+        <div class="nav-cluster">
+          <button id="soft-key-left" class="phone-btn soft-btn" title="Menu / Pause">
+            <span class="btn-label-sm">MENU</span>
+            <span class="btn-bar"></span>
+          </button>
+
+          <!-- 4-Way D-Pad with Center Button -->
+          <div class="dpad-container">
+            <button id="dpad-up" class="dpad-btn up" aria-label="Up">▲</button>
+            <button id="dpad-left" class="dpad-btn left" aria-label="Left">◀</button>
+            <button id="dpad-center" class="dpad-btn center" aria-label="Jump / Action">●</button>
+            <button id="dpad-right" class="dpad-btn right" aria-label="Right">▶</button>
+            <button id="dpad-down" class="dpad-btn down" aria-label="Down">▼</button>
+          </div>
+
+          <button id="soft-key-right" class="phone-btn soft-btn" title="Restart Level">
+            <span class="btn-label-sm">BACK</span>
+            <span class="btn-bar"></span>
+          </button>
+        </div>
+
+        <!-- 12-Key Numeric Keypad (Classic Nokia Layout) -->
+        <div class="numpad-grid">
+          <button id="key-1" class="numpad-btn">
+            <span class="num">1</span><span class="sub">. _ @</span>
+          </button>
+          <button id="key-2" class="numpad-btn key-action" title="Jump / Up (Key 2)">
+            <span class="num">2</span><span class="sub">abc ▲</span>
+          </button>
+          <button id="key-3" class="numpad-btn">
+            <span class="num">3</span><span class="sub">def</span>
+          </button>
+
+          <button id="key-4" class="numpad-btn key-action" title="Roll Left (Key 4)">
+            <span class="num">4</span><span class="sub">◀ ghi</span>
+          </button>
+          <button id="key-5" class="numpad-btn key-action key-center" title="Jump / Action (Key 5)">
+            <span class="num">5</span><span class="sub">● jkl</span>
+          </button>
+          <button id="key-6" class="numpad-btn key-action" title="Roll Right (Key 6)">
+            <span class="num">6</span><span class="sub">mno ▶</span>
+          </button>
+
+          <button id="key-7" class="numpad-btn">
+            <span class="num">7</span><span class="sub">pqrs</span>
+          </button>
+          <button id="key-8" class="numpad-btn key-action" title="Down / Sink (Key 8)">
+            <span class="num">8</span><span class="sub">tuv ▼</span>
+          </button>
+          <button id="key-9" class="numpad-btn">
+            <span class="num">9</span><span class="sub">wxyz</span>
+          </button>
+
+          <button id="key-star" class="numpad-btn">
+            <span class="num">*</span><span class="sub">+</span>
+          </button>
+          <button id="key-0" class="numpad-btn">
+            <span class="num">0</span><span class="sub">_</span>
+          </button>
+          <button id="key-hash" class="numpad-btn">
+            <span class="num">#</span><span class="sub">⇧</span>
+          </button>
+        </div>
+
+        <!-- Bottom Mic Hole -->
+        <div class="phone-bottom-mic">
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODALS -->
+
+  <!-- 1. Leaderboard Modal -->
+  <div id="scores-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>🏆 HALL OF FAME</h2>
+        <button id="btn-close-scores" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-sub">TOP NOKIA BOUNCE SCORES</p>
+        <div class="table-container">
+          <table class="scores-table">
+            <thead>
+              <tr>
+                <th>RANK</th>
+                <th>PLAYER</th>
+                <th>LEVEL</th>
+                <th>SCORE</th>
+                <th>DATE</th>
+              </tr>
+            </thead>
+            <tbody id="scores-tbody">
+              <tr><td colspan="5" style="text-align:center;">Loading scores...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Help & Controls Modal -->
+  <div id="help-modal" class="modal-backdrop hidden">
+    <div class="modal-box modal-large">
+      <div class="modal-header">
+        <h2>❓ HOW TO PLAY</h2>
+        <button id="btn-close-help" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="help-grid">
+          <div class="help-section">
+            <h3>🎮 CONTROLS</h3>
+            <ul class="help-list">
+              <li><strong>Left / Right:</strong> ◀ ▶ Arrow keys, A / D, or Nokia keys <strong>4 / 6</strong></li>
+              <li><strong>Jump / Bounce:</strong> ▲ Arrow, W, Space, or Nokia keys <strong>2 / 5</strong></li>
+              <li><strong>Down:</strong> ▼ Arrow, S, or Nokia key <strong>8</strong></li>
+              <li><strong>Pause / Menu:</strong> P, Escape, or Left Soft Key</li>
+              <li><strong>Restart:</strong> R, or Right Soft Key</li>
+              <li><strong>Secret Cheat:</strong> Dial <strong>787898</strong> on keypad for Invincible Flying Super Ball!</li>
+            </ul>
+          </div>
+
+          <div class="help-section">
+            <h3>⭕ OBJECTIVES & MECHANICS</h3>
+            <ul class="help-list">
+              <li><strong>Golden Rings:</strong> Collect ALL rings in each level to unlock the Exit Gate!</li>
+              <li><strong>Exit Gate:</strong> Locked by default. Once rings are 0, jump inside to clear the level!</li>
+              <li><strong>Spikes:</strong> Lethal red spikes pop your ball! Avoid at all costs.</li>
+              <li><strong>Trampolines:</strong> Orange spring pads catapult you high into the sky!</li>
+              <li><strong>Size Pumps:</strong>
+                <br>• <strong>Yellow (▲):</strong> Giant ball! Super bouncy, breaks cracked walls, floats on water!
+                <br>• <strong>Blue (▼):</strong> Tiny ball! Squeezes through 1-tile gaps and pipes!
+                <br>• <strong>Green (●):</strong> Returns ball to Normal size!
+              </li>
+              <li><strong>Water Buoyancy:</strong> Big ball floats effortlessly. Small ball sinks. Tap jump to swim upward!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Level Editor Modal -->
+  <div id="editor-modal" class="modal-backdrop hidden">
+    <div class="modal-box modal-xl">
+      <div class="modal-header">
+        <h2>🛠️ NOKIA BOUNCE LEVEL BUILDER</h2>
+        <button id="btn-close-editor" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar">
+          <div class="tool-palette">
+            <span class="tool-label">TOOL:</span>
+            <button class="palette-btn active" data-tool="brick">🧱 Brick</button>
+            <button class="palette-btn" data-tool="cracked">🪨 Cracked</button>
+            <button class="palette-btn" data-tool="water">🌊 Water</button>
+            <button class="palette-btn" data-tool="spike_up">🔺 Spike Up</button>
+            <button class="palette-btn" data-tool="spike_down">🔻 Spike Down</button>
+            <button class="palette-btn" data-tool="spring">⚡ Spring</button>
+            <button class="palette-btn" data-tool="ring_v">⭕ Ring (V)</button>
+            <button class="palette-btn" data-tool="ring_h">⭕ Ring (H)</button>
+            <button class="palette-btn" data-tool="pump_in">🟡 Big Pump</button>
+            <button class="palette-btn" data-tool="pump_de">🔵 Small Pump</button>
+            <button class="palette-btn" data-tool="pump_norm">🟢 Normal Pump</button>
+            <button class="palette-btn" data-tool="checkpoint">🚩 Checkpoint</button>
+            <button class="palette-btn" data-tool="1up">❤️ 1UP</button>
+            <button class="palette-btn" data-tool="spawn">🔴 Spawn</button>
+            <button class="palette-btn" data-tool="exit">🚪 Exit</button>
+            <button class="palette-btn eraser" data-tool="air">🧹 Erase</button>
+          </div>
+
+          <div class="editor-actions">
+            <button id="btn-editor-test" class="btn-retro btn-highlight">▶ TEST LEVEL NOW</button>
+            <button id="btn-editor-save-server" class="btn-retro">💾 Save To Server</button>
+            <button id="btn-editor-export" class="btn-retro">📋 Copy JSON</button>
+            <button id="btn-editor-clear" class="btn-retro btn-danger">🗑️ Clear</button>
+          </div>
+        </div>
+
+        <!-- Editor Canvas Scroll Area -->
+        <div class="editor-canvas-container">
+          <canvas id="editor-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
